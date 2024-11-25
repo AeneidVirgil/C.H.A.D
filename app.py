@@ -11,7 +11,7 @@ import math
 st.write("All expresion inputs have to be done in python language")
 
 # Define the functions for each topic
-
+#Calulus 
 # Function to evaluate the limit step by step
 def step_by_step_limit_evaluator():
     # Define the variable
@@ -342,17 +342,20 @@ def snells_law():
         st.error("Invalid input or total internal reflection occurred.")
 
 def thin_lens_equation():
-    st.header("Thin Lens Equation")
+    st.header("Thin Lens Equation Solver")
+
     try:
-        f = st.number_input("Enter focal length (f in cm)", value=0.0, format="%.2f")
-        u = st.number_input("Enter object distance (u in cm)", value=0.0, format="%.2f")
-        if f != 0 and u != 0:
-            v = 1 / ((1 / f) - (1 / u))
-            st.write(f"Image distance (v) = {v:.2f} cm")
+        s = st.number_input("Enter object distance (s in cm)", value=0.0, format="%.2f")
+        s_prime = st.number_input("Enter image distance (s' in cm)", value=0.0, format="%.2f")
+
+        # Check if both s and s' are non-zero
+        if s != 0 and s_prime != 0:
+            f = 1 / (1 / s + 1 / s_prime)  # Formula for the focal length
+            st.write(f"Focal length (f) = {f:.2f} cm")
         else:
-            st.error("Focal length and object distance must be non-zero.")
-    except:
-        st.error("Please enter valid numerical inputs.")
+            st.error("Object distance (s) and image distance (s') must be non-zero.")
+    except Exception as e:
+        st.error(f"Error: {e}. Please enter valid numerical inputs.")
 
 def lens_maker_equation():
     st.header("Lens Maker's Equation")
@@ -368,16 +371,270 @@ def lens_maker_equation():
     except:
         st.error("Please enter valid numerical inputs.")
 
-# Main Streamlit App Function
+#Statistics 
+
+def plot_histogram(data, title, xlabel, ylabel):
+    plt.figure(figsize=(10, 6))
+    plt.hist(data, bins=15, edgecolor='black')
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    st.pyplot(plt)
+
+def plot_scatter(x, y, title, xlabel, ylabel):
+    plt.figure(figsize=(10, 6))
+    plt.scatter(x, y)
+    plt.title(title)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    st.pyplot(plt)
+
+# Function to calculate binomial probability
+def binomial_probability(n, k, p):
+    from math import comb
+    return comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
+
+# Function to calculate normal probability density
+def normal_pdf(x, mu, sigma):
+    return (1 / (sigma * math.sqrt(2 * math.pi))) * math.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+# Function to calculate basic probability
+def basic_probability(event_outcomes, total_outcomes):
+    return event_outcomes / total_outcomes
+
+# Function to calculate conditional probability
+def conditional_probability(event_a_and_b, event_b):
+    return event_a_and_b / event_b
+
+# Function to check independence
+def check_independence(prob_a, prob_b, prob_a_and_b):
+    return prob_a_and_b == prob_a * prob_b
+
+# Function to generate random numbers
+def generate_random_numbers(count, start, end):
+    return [random.randint(start, end) for _ in range(count)]
+
+# Function to calculate mean, median, and mode
+def calculate_stats(data):
+    mean = statistics.mean(data)
+    median = statistics.median(data)
+    try:
+        mode = statistics.mode(data)
+    except statistics.StatisticsError:
+        mode = "No unique mode found"
+    return mean, median, mode
+
+# Function to calculate range, variance, standard deviation, IQR, and identify outliers
+def calculate_advanced_stats(data):
+    data_range = max(data) - min(data)
+    variance = statistics.variance(data)
+    std_dev = statistics.stdev(data)
+    sorted_data = sorted(data)
+    q1 = sorted_data[len(data) // 4]
+    q3 = sorted_data[(len(data) * 3) // 4]
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    outliers = [x for x in data if x < lower_bound or x > upper_bound]
+    return data_range, variance, std_dev, iqr, outliers
+
+# Function to generate sampling distribution of the sample mean
+def sampling_distribution(population, sample_size, num_samples):
+    sample_means = []
+    for _ in range(num_samples):
+        sample = random.sample(population, sample_size)
+        sample_means.append(statistics.mean(sample))
+    return sample_means
+
+# Function to perform simple random sampling
+def simple_random_sampling(data, sample_size):
+    if sample_size > len(data) or sample_size < 0:
+        raise ValueError("Sample size must be between 0 and the size of the population.")
+    return random.sample(data, sample_size)
+
+# Function to calculate Chi-Square statistic
+def chi_square_statistic(observed, expected):
+    chi2 = 0
+    for o, e in zip(observed, expected):
+        chi2 += (o - e) ** 2 / e
+    return chi2
+
+# Function to calculate confidence interval
+def confidence_interval(data, confidence=0.95):
+    n = len(data)
+    mean = statistics.mean(data)
+    std_err = statistics.stdev(data) / math.sqrt(n)
+    margin_of_error = std_err * 1.96  # For 95% confidence
+    return mean - margin_of_error, mean + margin_of_error
+
+def confidence_interval_calculations():
+    data_input = st.text_input("Enter your data set, separated by commas (e.g., 10, 12, 23, 23, 16, 23, 21, 16, 18, 20):", "10,12,23,23,16,23,21,16,18,20")
+    data = list(map(int, data_input.split(',')))
+    conf_int = confidence_interval(data)
+    st.write(f"95% Confidence Interval: {conf_int}")
+
+# Function to perform stratified random sampling
+def stratified_random_sampling(data, strata, sample_size):
+    stratified_sample = []
+    for stratum in strata:
+        stratum_data = [item for item in data if item[1] == stratum]
+        stratum_sample_size = int(sample_size * (len(stratum_data) / len(data)))
+        stratified_sample.extend(random.sample(stratum_data, stratum_sample_size))
+    return stratified_sample
+
+def stratified_random_sampling_calculations():
+    data_input = st.text_input("Enter your data set as value,stratum pairs, separated by commas (e.g., 1,A,2,A,3,B): ", "1,A,2,A,3,B")
+    strata_input = st.text_input("Enter your strata, separated by commas (e.g., A,B,C): ", "A,B,C")
+    sample_size = st.number_input("Enter the sample size: ", min_value=1, value=1)
+
+    data = [(int(data_input.split(',')[i]), data_input.split(',')[i+1]) for i in range(0, len(data_input.split(',')), 2)]
+    strata = strata_input.split(',')
+
+    try:
+        sample = stratified_random_sampling(data, strata, sample_size)
+        st.write(f"Stratified Random Sample: {sample}")
+    except ValueError as e:
+        st.error(e)
+
+# Function to calculate expected frequencies
+def calculate_expected(observed):
+    row_totals = [sum(row) for row in observed]
+    col_totals = [sum(col) for col in zip(*observed)]
+    total = sum(row_totals)
+    expected = [[(row_total * col_total) / total for col_total in col_totals] for row_total in row_totals]
+    return expected
+
+# Function to flip a coin multiple times
+def flip_coin(times):
+    heads = 0
+    tails = 0
+    for _ in range(times):
+        result = random.choice(['Heads', 'Tails'])
+        if result == 'Heads':
+            heads += 1
+        else:
+            tails += 1
+    return heads, tails
+
+def distribution_calculations():
+    dist_type = st.selectbox("Which distribution would you like to calculate?", ("binomial", "normal"))
+    
+    if dist_type == 'binomial':
+        n = st.number_input("Enter the number of trials", min_value=1, value=10)
+        p = st.number_input("Enter the probability of success", min_value=0.0, max_value=1.0, value=0.5)
+        x = list(range(n + 1))
+        binom_pmf = [binomial_probability(n, k, p) for k in x]
+        for k, prob in zip(x, binom_pmf):
+            st.write(f"Number of successes: {k}, Probability: {prob}")
+    elif dist_type == 'normal':
+        mu = st.number_input("Enter the mean", value=0.0)
+        sigma = st.number_input("Enter the standard deviation", min_value=0.0, value=1.0)
+        x = [mu + sigma * i / 10 for i in range(-30, 31)]
+        norm_pdf = [normal_pdf(val, mu, sigma) for val in x]
+        for val, prob in zip(x, norm_pdf):
+            st.write(f"Value: {val}, Probability Density: {prob}")
+
+def probability_calculations():
+    num_events = st.number_input("How many events are there?", min_value=1, value=1)
+    event_names = []
+    event_outcomes = []
+
+    for i in range(num_events):
+        event_name = st.text_input(f"Enter the name of event {i+1}", f"Event {i+1}")
+        outcomes = st.number_input(f"Enter the number of outcomes for {event_name}", min_value=1, value=30)
+        event_names.append(event_name)
+        event_outcomes.append(outcomes)
+
+    total_outcomes = st.number_input("Enter the total number of outcomes", min_value=1, value=100)
+    probabilities = {name: basic_probability(outcomes, total_outcomes) for name, outcomes in zip(event_names, event_outcomes)}
+
+    st.write("Probabilities:")
+    for name, prob in probabilities.items():
+        st.write(f"Probability of {name}: {prob}")
+
+def random_number_generation():
+    start = st.number_input("Enter the lower range", value=1)
+    end = st.number_input("Enter the upper range", value=100)
+    count = st.number_input("How many random numbers do you want to generate?", min_value=1, value=10)
+    random_numbers = generate_random_numbers(count, start, end)
+    st.write(f"Random Numbers: {random_numbers}")
+
+def statistics_calculations():
+    data_input = st.text_input("Enter your data set, separated by commas", "10,20,30")
+    data = list(map(int, data_input.split(',')))
+    mean, median, mode = calculate_stats(data)
+    st.write(f"Mean: {mean}")
+    st.write(f"Median: {median}")
+    st.write(f"Mode: {mode}")
+    plot_histogram(data, 'Histogram of Data', 'Value', 'Frequency')
+
+def advanced_statistics_calculations():
+    data_input = st.text_input("Enter your data set, separated by commas", "1,2,3")
+    data = list(map(int, data_input.split(',')))
+    data_range, variance, std_dev, iqr, outliers = calculate_advanced_stats(data)
+    st.write(f"Range: {data_range}")
+    st.write(f"Variance: {variance}")
+    st.write(f"Standard Deviation: {std_dev}")
+    st.write(f"Interquartile Range (IQR): {iqr}")
+    st.write(f"Outliers: {outliers}")
+    plot_histogram(data, 'Histogram of Data', 'Value', 'Frequency')
+
+def sampling_distribution_calculations():
+    population_size = st.number_input("Enter the population size for sampling distribution", min_value=1, value=100)
+    population = list(range(1, population_size + 1))
+    sample_size = st.number_input("Enter the sample size for sampling distribution", min_value=1, value=10)
+    num_samples = st.number_input("Enter the number of samples", min_value=1, value=100)
+    sample_means = sampling_distribution(population, sample_size, num_samples)
+    st.write(f"Sample Means: {sample_means}")
+    st.write(f"Mean of Sample Means: {statistics.mean(sample_means)}")
+    st.write(f"Standard Deviation of Sample Means: {statistics.stdev(sample_means)}")
+    st.write("Shape: According to the Central Limit Theorem, the sampling distribution of the sample mean will be approximately normally distributed if the sample size is sufficiently large.")
+    plot_histogram(sample_means, 'Sampling Distribution of Sample Means', 'Sample Mean', 'Frequency')
+
+def simple_random_sampling_calculations():
+    population_size = st.number_input("Enter the population size for random sampling", min_value=1, value=100)
+    data = list(range(1, population_size + 1))
+    sample_size = st.number_input("Enter the sample size for random sampling", min_value=1, value=10)
+    try:
+        sample = simple_random_sampling(data, sample_size)
+        st.write(f"Random Sample: {sample}")
+    except ValueError as e:
+        st.error(e)
+
+def chi_square_test():
+    num_rows = st.number_input("Enter the number of rows for Chi-Square test", min_value=1, value=2)
+    st.write("Enter the observed data row by row, with values separated by commas (e.g., 10,20,30):")
+    observed = []
+    for i in range(num_rows):
+        row = list(map(int, st.text_input(f"Row {i+1}").split(',')))
+        observed.append(row)
+    
+    expected = calculate_expected(observed)
+    chi2 = chi_square_statistic([item for sublist in observed for item in sublist], [item for sublist in expected for item in sublist])
+    dof = (num_rows - 1) * (len(observed[0]) - 1)
+
+    st.write(f"Chi-Square Statistic: {chi2}")
+    st.write(f"Degrees of Freedom: {dof}")
+    st.write("Expected Frequencies:")
+    for row in expected:
+        st.write(row)
+
+def coin_flip_simulation():
+    times = st.number_input("How many times do you want to flip the coin?", min_value=1, value=10)
+    heads, tails = flip_coin(times)
+    st.write(f"Heads: {heads}")
+    st.write(f"Tails: {tails}")
+
+
+#Streamlit Code
 def main():
     st.title("Comprehensive High-precision Algorithmic Device (C.H.A.D.)")
 
     # Create a dropdown menu for main topics
-    tab = st.selectbox("Select a Topic", ["Calculus", "Physics"])
+    tab = st.selectbox("Select a Topic", ["Calculus", "Physics", "Statistics"])
 
     # Handle Calculus options
     if tab == "Calculus":
-        # Dropdown for Calculus operations
         operation = st.selectbox("Select an Operation", [
             "Limit Evaluation",
             "Derivative Evaluation",
@@ -399,7 +656,6 @@ def main():
 
     # Handle Physics options
     elif tab == "Physics":
-        # Dropdown for Physics topics
         physics_topic = st.selectbox("Select a Physics Topic", [
             "Kinematics",
             "Projectile Motion",
@@ -421,6 +677,47 @@ def main():
             thin_lens_equation()
         elif physics_topic == "Lens Maker's Equation":
             lens_maker_equation()
+
+    # Handle Statistics options
+    elif tab == "Statistics":
+        # Sidebar for Statistical Calculations
+        st.sidebar.header("Choose a calculation")
+        choice = st.sidebar.selectbox("Select one", [
+            "Distributions (binomial/normal)", 
+            "Probabilities", 
+            "Random Number Generation", 
+            "Statistics Calculations", 
+            "Advanced Statistics Calculations", 
+            "Sampling Distribution Calculations", 
+            "Simple Random Sampling", 
+            "Stratified Random Sampling", 
+            "Chi-Square Test", 
+            "Coin Flip Simulation", 
+            "Confidence Interval"
+        ])
+
+        if choice == "Distributions (binomial/normal)":
+            distribution_calculations()
+        elif choice == "Probabilities":
+            probability_calculations()
+        elif choice == "Random Number Generation":
+            random_number_generation()
+        elif choice == "Statistics Calculations":
+            statistics_calculations()
+        elif choice == "Advanced Statistics Calculations":
+            advanced_statistics_calculations()
+        elif choice == "Sampling Distribution Calculations":
+            sampling_distribution_calculations()
+        elif choice == "Simple Random Sampling":
+            simple_random_sampling_calculations()
+        elif choice == "Stratified Random Sampling":
+            stratified_random_sampling_calculations()
+        elif choice == "Chi-Square Test":
+            chi_square_test()
+        elif choice == "Coin Flip Simulation":
+            coin_flip_simulation()
+        elif choice == "Confidence Interval":
+            confidence_interval_calculations()
 
 if __name__ == "__main__":
     main()
