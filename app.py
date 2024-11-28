@@ -7,6 +7,10 @@ import math
 import cmath
 import random
 import math
+from PIL import Image
+import pytesseract
+from streamlit_drawable_canvas import st_canvas
+
 
 st.write("All expresion inputs have to be done in python language")
 
@@ -202,6 +206,59 @@ def step_by_step_series_evaluator():
 
 #Taylor Series
 
+#Code for recognizing image 
+def recognize_math_expression(image):
+    try:
+        text = pytesseract.image_to_string(image, config="--psm 6")
+        return text.strip()
+    except Exception as e:
+        st.error(f"Error recognizing the equation: {e}")
+        return None
+
+# Modified Limit Evaluator with Math Equation Reader
+def step_by_step_limit_evaluator_with_reader():
+    st.header("Step-by-Step Limit Evaluator with Handwritten Input")
+
+    # Option to upload an image or draw an equation
+    st.write("Upload an image of your handwritten equation or draw it below:")
+    col1, col2 = st.columns(2)
+    with col1:
+        uploaded_file = st.file_uploader("Upload Image", type=["jpg", "png", "jpeg"])
+    with col2:
+        canvas_result = st_canvas(
+            stroke_width=2,
+            stroke_color="#000000",
+            background_color="#FFFFFF",
+            height=150,
+            width=300,
+            drawing_mode="freedraw",
+            key="canvas",
+        )
+
+    # Process input
+    if uploaded_file or (canvas_result and canvas_result.image_data is not None):
+        image = Image.open(uploaded_file) if uploaded_file else Image.fromarray(canvas_result.image_data.astype("uint8"))
+        st.image(image, caption="Uploaded or Drawn Image", use_column_width=True)
+
+        # Recognize the math expression
+        recognized_expr = recognize_math_expression(image)
+        if recognized_expr:
+            st.write(f"Recognized Expression: `{recognized_expr}`")
+
+            # Try to parse the recognized expression into sympy
+            try:
+                x = sp.symbols('x')  # Define the variable
+                expr = sp.sympify(recognized_expr)
+                st.write(f"Parsed Expression: {expr}")
+
+                # Continue with limit evaluation
+                point_input = st.text_input("Enter the limit point (e.g., 0, infinity, -infinity):", "0")
+                if point_input:
+                    point = sp.sympify(point_input) if point_input not in ["infinity", "-infinity"] else sp.oo if point_input == "infinity" else -sp.oo
+                    limit_result = sp.limit(expr, x, point)
+                    st.write(f"The limit is: {limit_result}")
+            except sp.SympifyError:
+                st.error("Unable to parse the recognized expression. Please try again.")
 
 #PHYSICS 
 #Kinematics 
@@ -636,14 +693,14 @@ def main():
     # Handle Calculus options
     if tab == "Calculus":
         operation = st.selectbox("Select an Operation", [
-            "Limit Evaluation",
+            "Limit Evaluation (with Reader)",
             "Derivative Evaluation",
             "Integral Evaluation",
             "Definite Integral Evaluation",
             "Series"
         ])
 
-        if operation == "Limit Evaluation":
+        if operation == "Limit Evaluation (with Reader)":
             step_by_step_limit_evaluator()
         elif operation == "Derivative Evaluation":
             step_by_step_derivative_evaluator()
